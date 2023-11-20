@@ -1,15 +1,32 @@
 import { Schema, model } from 'mongoose';
+import validator from 'validator';
+
 import {
-  Guardian,
-  LocalGuardian,
-  Student,
-  UserName,
+  TGuardian,
+  TLocalGuardian,
+  TStudent,
+  // StudentMethods,
+  StudentModel,
+  TUserName,
 } from './student/student.interface';
 
-const userNameSchema = new Schema<UserName>({
+const userNameSchema = new Schema<TUserName>({
   firstName: {
     type: String,
     required: [true, 'First name is require'],
+    trim: true, //for remove extra space
+    maxlength: [20, 'First name can not be more than 20 characters'],
+
+    //Custom made validation start-----------------------------------------
+    // validate: {
+    //   validator: function (value: string) {
+    //     const firstNameStr =
+    //       value.charAt(0).toUpperCase() + value.slice(1).toLowerCase();
+    //     return firstNameStr === value;
+    //   },
+    //   message: '{VALUE} is not in capitalize format',
+    // },
+    //Custom made validation end-----------------------------------------
   },
   middleName: {
     type: String,
@@ -17,10 +34,17 @@ const userNameSchema = new Schema<UserName>({
   lastName: {
     type: String,
     required: [true, 'Last name is require'],
+
+    //3rd party made validation start----------------------------------------- npm
+    validate: {
+      validator: (value: string) => validator.isAlpha(value),
+      message: '{VALUE} is not valid',
+    },
+    //3rd party made validation end-----------------------------------------
   },
 });
 
-const guardianSchema = new Schema<Guardian>({
+const guardianSchema = new Schema<TGuardian>({
   fatherName: {
     type: String,
     required: true,
@@ -47,7 +71,7 @@ const guardianSchema = new Schema<Guardian>({
   },
 });
 
-const localGuardianSchema = new Schema<LocalGuardian>({
+const localGuardianSchema = new Schema<TLocalGuardian>({
   name: {
     type: String,
     required: true,
@@ -66,7 +90,7 @@ const localGuardianSchema = new Schema<LocalGuardian>({
   },
 });
 
-const studentSchema = new Schema<Student>({
+const studentSchema = new Schema<TStudent, StudentModel>({
   id: { type: String, required: true, unique: true }, //unique: true for avoiding same id
   name: {
     type: userNameSchema,
@@ -82,7 +106,19 @@ const studentSchema = new Schema<Student>({
     required: [true, 'Gender is require'],
   },
   dateOfBirth: { type: String },
-  email: { type: String, required: true, unique: true },
+
+  email: {
+    type: String,
+    required: true,
+    unique: true,
+
+    // 3rd party validation npm
+    validate: {
+      validator: (value: string) => validator.isEmail(value),
+      message: '{VALUE} is not valid email type',
+    },
+  },
+
   contactNo: { type: String, required: true },
   emergencyContactNo: { type: String, required: true },
   bloodGroup: {
@@ -107,4 +143,16 @@ const studentSchema = new Schema<Student>({
   },
 });
 
-export const StudentModel = model<Student>('Student', studentSchema);
+//creating a custom static method
+studentSchema.statics.isUserExists = async function (id: string) {
+  const existingUser = await Student.findOne({ id });
+  return existingUser;
+};
+
+//creating a custom instance method
+// studentSchema.methods.isUserExists = async function (id: string) {
+//   const existingUser = await Student.findOne({ id });
+//   return existingUser;
+// };
+
+export const Student = model<TStudent, StudentModel>('Student', studentSchema);
