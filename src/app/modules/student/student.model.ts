@@ -1,16 +1,9 @@
 import { Schema, model } from 'mongoose';
 import validator from 'validator';
 import bcrypt from 'bcrypt';
-import config from '../config';
+import { TUserName, TGuardian, TLocalGuardian, TStudent, StudentModel } from './student.interface';
+import config from '../../config';
 
-import {
-  TGuardian,
-  TLocalGuardian,
-  TStudent,
-  // StudentMethods,
-  StudentModel,
-  TUserName,
-} from './student/student.interface';
 
 const userNameSchema = new Schema<TUserName>({
   firstName: {
@@ -207,10 +200,6 @@ studentSchema.pre('aggregate', function (next) {
   next();
 });
 
-//creating a custom instance method
-// studentSchema.methods.isUserExists = async function (id: string) {
-//   const existingUser = await Student.findOne({ id });
-//   return existingUser;
-// };
+
 
 export const Student = model<TStudent, StudentModel>('Student', studentSchema);
