@@ -111,7 +111,7 @@ const studentSchema = new Schema<TStudent, StudentModel>(
       },
       required: [true, 'Gender is require'],
     },
-    dateOfBirth: { type: String },
+    dateOfBirth: { type: Date },
 
     email: {
       type: String,
