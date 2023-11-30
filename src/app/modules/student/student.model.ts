@@ -4,6 +4,7 @@ import { TUserName, TGuardian, TLocalGuardian, TStudent, StudentModel } from './
 
 
 
+
 const userNameSchema = new Schema<TUserName>({
   firstName: {
     type: String,
@@ -111,7 +112,7 @@ const studentSchema = new Schema<TStudent, StudentModel>(
       },
       required: [true, 'Gender is require'],
     },
-    dateOfBirth: { type: Date },
+    dateOfBirth: { type: String },
 
     email: {
       type: String,
@@ -142,13 +143,10 @@ const studentSchema = new Schema<TStudent, StudentModel>(
       required: true,
     },
     profileImg: { type: String },
-
-    // isActive: {
-    //   type: String,
-    //   enum: ['active', 'blocked'],
-    //   default: 'active',
-    // },
-    
+    admissionSemester:{
+      type: Schema.Types.ObjectId,
+      ref:'AcademicSemester',
+    },
     isDeleted: {
       type: Boolean,
       default: false,
