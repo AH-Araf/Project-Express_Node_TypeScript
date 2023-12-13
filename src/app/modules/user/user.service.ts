@@ -20,7 +20,8 @@ const createStudentIntoDB = async (password: string, payload: TStudent) => {
   userData.role = 'student';
 
   // find academic semester info
-  const admissionSemester = await AcademicSemester.findById(
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const admissionSemester : any = await AcademicSemester.findById(
     payload.admissionSemester,
   );
 
@@ -54,10 +55,11 @@ const createStudentIntoDB = async (password: string, payload: TStudent) => {
     await session.endSession();
 
     return newStudent;
-  } catch (err) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  } catch (err: any) {
     await session.abortTransaction();
     await session.endSession();
-    throw new Error('Failed to create student');
+    throw new Error(err);
   }
 };
 
